@@ -1,7 +1,12 @@
 package knu.notice.knunoticeserver.repository
 
+import com.querydsl.core.BooleanBuilder
+import com.querydsl.core.types.dsl.BooleanExpression
+import com.querydsl.jpa.impl.JPAQuery
+import com.querydsl.jpa.impl.JPAQueryFactory
+import knu.notice.knunoticeserver.domain.DefaultPage
 import knu.notice.knunoticeserver.domain.Notice
-import org.springframework.jdbc.core.BeanPropertyRowMapper
+import knu.notice.knunoticeserver.domain.QNotice
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.stereotype.Repository
@@ -11,34 +16,28 @@ import java.time.format.DateTimeFormatter
 import java.util.stream.Collectors
 
 @Repository
-class NoticeCustomRepository(private val jdbcTemplate: JdbcTemplate) {
-    companion object {
-        private val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.0")
-        val rowMapper = RowMapper<Notice> { rs: ResultSet, _: Int ->
-            Notice(
-                rs.getLong("id"),
-                rs.getLong("bid"),
-                rs.getString("code"),
-                rs.getInt("is_fixed") == 1,
-                rs.getString("title"),
-                rs.getString("link"),
-                rs.getDate("date").toLocalDate(),
-                rs.getString("author"),
-                rs.getString("reference"),
-                LocalDateTime.parse(rs.getString("created_at"), formatter)
-            )
+class NoticeCustomRepository(private val jpaQueryFactory: JPAQueryFactory) {
+    fun getAllByDepartmentAndKeyword(
+        departments: List<String>,
+        keywords: List<String>,
+        curPageNumber: Int
+    ): List<Notice> {
+        val qNotice = QNotice.notice
+        return jpaQueryFactory
+            .selectFrom(qNotice)
+            .where(getDepartmentsAndKeywordsWhere(departments, keywords))
+            .orderBy(qNotice.createdAt.desc())
+            .offset(curPageNumber.toLong())
+            .limit(DefaultPage.toLong())
+            .fetch()
+    }
+
+    private fun getDepartmentsAndKeywordsWhere(departments: List<String>, keywords: List<String>): BooleanExpression {
+        val qNotice = QNotice.notice
+        val boolExp = BooleanBuilder()
+        for (keyword in keywords) {
+            boolExp.or(qNotice.title.like("%$keyword%"))
         }
-    }
-
-    fun getAllByDepartmentAndKeyword(departments: List<String>, keywords: List<String>): List<Notice> {
-        val query = getQuery(departments, keywords)
-        return jdbcTemplate.query(query, rowMapper)
-    }
-
-    private fun getQuery(departments: List<String>, keywords: List<String>): String {
-        return "SELECT id, bid, code, is_fixed, title, link, date, author, reference, created_at " +
-                "FROM notice WHERE (code in ('" + departments.stream().collect(Collectors.joining("', '")) + "')) " +
-                "AND (title like '%" + keywords.stream().collect(Collectors.joining("%' or title like '%")) + "%') " +
-                "ORDER BY created_at desc"
+        return qNotice.code.`in`(departments).and(boolExp)
     }
 }

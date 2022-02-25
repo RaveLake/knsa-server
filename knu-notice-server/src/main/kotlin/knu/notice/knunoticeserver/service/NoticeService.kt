@@ -2,9 +2,9 @@ package knu.notice.knunoticeserver.service
 
 import knu.notice.knunoticeserver.domain.DefaultPage
 import knu.notice.knunoticeserver.domain.NoticeAllUrl
-import knu.notice.knunoticeserver.error.exception.NoticeNotFoundException
 import knu.notice.knunoticeserver.dto.BaseResponse
 import knu.notice.knunoticeserver.dto.NoticeDTO
+import knu.notice.knunoticeserver.error.exception.NoticeNotFoundException
 import knu.notice.knunoticeserver.repository.NoticeCustomRepository
 import knu.notice.knunoticeserver.repository.NoticeRepository
 import knu.notice.knunoticeserver.util.makeBaseResponse
@@ -36,11 +36,13 @@ class NoticeService(
 
     fun getNoticeByDepartment(curPageNumber: Int, departments: String): BaseResponse<NoticeDTO> {
         val departmentList = departments.split("+", " ").toList()
-        val noticeList = noticeRepository.getAllByCodeInOrderByCreatedAtDesc(departmentList)
+        val noticeList = noticeRepository.getAllByCodeInOrderByCreatedAtDesc(
+            departmentList,
+            PageRequest.of(curPageNumber - 1, DefaultPage)
+        )
         if (noticeList.isEmpty())
             throw NoticeNotFoundException()
-        val noticeDTOList = noticeList.subList((curPageNumber - 1) * DefaultPage, curPageNumber * DefaultPage).stream()
-            .map { notice -> NoticeDTO(notice) }.collect(Collectors.toList())
+        val noticeDTOList = noticeList.stream().map { notice -> NoticeDTO(notice) }.collect(Collectors.toList())
         return makeBaseResponse(noticeList.size.toLong(), curPageNumber, NoticeAllUrl, noticeDTOList)
     }
 
@@ -51,11 +53,11 @@ class NoticeService(
     ): BaseResponse<NoticeDTO> {
         val departmentList = departments.split("+", " ").toList()
         val keywordList = keywords.split("+", " ").toList()
-        val noticeList = noticeCustomRepository.getAllByDepartmentAndKeyword(departmentList, keywordList)
+        val noticeList =
+            noticeCustomRepository.getAllByDepartmentAndKeyword(departmentList, keywordList, curPageNumber - 1)
         if (noticeList.isEmpty())
             throw NoticeNotFoundException()
-        val noticeDTOList = noticeList.subList((curPageNumber - 1) * DefaultPage, curPageNumber * DefaultPage).stream()
-            .map { notice -> NoticeDTO(notice) }.collect(Collectors.toList())
+        val noticeDTOList = noticeList.stream().map { notice -> NoticeDTO(notice) }.collect(Collectors.toList())
         return makeBaseResponse(noticeList.size.toLong(), curPageNumber, NoticeAllUrl, noticeDTOList)
     }
 }

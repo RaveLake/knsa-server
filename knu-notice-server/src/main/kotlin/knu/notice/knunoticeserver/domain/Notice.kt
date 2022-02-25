@@ -7,8 +7,8 @@ import javax.persistence.Entity
 import javax.persistence.Id
 import javax.persistence.Table
 
-@Entity(name = "notice")
-@Table
+@Entity
+@Table(name = "notice")
 class Notice(
     @Id
     val id: Long,

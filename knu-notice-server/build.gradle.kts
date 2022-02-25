@@ -7,11 +7,14 @@ plugins {
     kotlin("jvm") version "1.6.0"
     kotlin("plugin.spring") version "1.6.0"
     kotlin("plugin.jpa") version "1.6.0"
+    kotlin("kapt") version "1.4.10"
+    idea
 }
 
 group = "knu.notice"
 version = "0.0.1-SNAPSHOT"
 java.sourceCompatibility = JavaVersion.VERSION_11
+val queryDSLVersion = "5.0.0"
 
 configurations {
     compileOnly {
@@ -41,6 +44,17 @@ dependencies {
     implementation("com.google.firebase", "firebase-admin", "6.8.1")
     implementation("com.squareup.okhttp3", "okhttp", "4.2.2")
     implementation("com.google.firebase", "firebase-admin", "6.10.0")
+    implementation("com.querydsl:querydsl-jpa:$queryDSLVersion")
+    kapt("com.querydsl:querydsl-apt:$queryDSLVersion:jpa")
+    kapt("org.springframework.boot:spring-boot-configuration-processor")
+}
+
+idea {
+    module {
+        val kaptMain = file("build/generated/source/kapt/main")
+        sourceDirs.add(kaptMain)
+        generatedSourceDirs.add(kaptMain)
+    }
 }
 
 tasks.withType<KotlinCompile> {
