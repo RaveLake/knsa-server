@@ -17,6 +17,16 @@ import java.util.stream.Collectors
 
 @Repository
 class NoticeCustomRepository(private val jpaQueryFactory: JPAQueryFactory) {
+
+    fun getTotalSizeByDepartmentAndKeyword(departments: List<String>, keywords: List<String>): Long {
+        val qNotice = QNotice.notice
+        return jpaQueryFactory
+            .selectFrom(qNotice)
+            .where(getDepartmentsAndKeywordsWhere(departments, keywords))
+            .orderBy(qNotice.createdAt.desc())
+            .fetch().size.toLong()
+    }
+
     fun getAllByDepartmentAndKeyword(
         departments: List<String>,
         keywords: List<String>,

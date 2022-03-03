@@ -19,7 +19,7 @@ class Notice(
     val title: String,
     val link: String,
     val date: LocalDate,
-    val author: String,
+    val author: String?,
     val reference: String?,
     @JsonProperty("created_at")
     val createdAt: LocalDateTime,

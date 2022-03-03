@@ -4,7 +4,6 @@ import knu.notice.knunoticeserver.domain.DefaultPage
 import knu.notice.knunoticeserver.domain.NoticeAllUrl
 import knu.notice.knunoticeserver.dto.BaseResponse
 import knu.notice.knunoticeserver.dto.NoticeDTO
-import knu.notice.knunoticeserver.error.exception.NoticeNotFoundException
 import knu.notice.knunoticeserver.repository.NoticeCustomRepository
 import knu.notice.knunoticeserver.repository.NoticeRepository
 import knu.notice.knunoticeserver.util.makeBaseResponse
@@ -20,6 +19,7 @@ class NoticeService(
 ) {
 
     fun getNoticeByPageNation(curPageNumber: Int): BaseResponse<NoticeDTO> {
+        val count = noticeRepository.count()
         val results = noticeRepository.findAll(
             PageRequest.of(
                 curPageNumber - 1,
@@ -29,21 +29,17 @@ class NoticeService(
         ).content.stream().map { notice -> NoticeDTO(notice) }.collect(
             Collectors.toList()
         )
-        if (results.isEmpty())
-            throw NoticeNotFoundException()
-        return makeBaseResponse(noticeRepository.count(), curPageNumber, NoticeAllUrl, results)
+        return makeBaseResponse(count, curPageNumber, NoticeAllUrl, results)
     }
 
     fun getNoticeByDepartment(curPageNumber: Int, departments: String): BaseResponse<NoticeDTO> {
         val departmentList = departments.split("+", " ").toList()
+        val count = noticeRepository.getTotalSizeByCodeIn(departmentList)
         val noticeList = noticeRepository.getAllByCodeInOrderByCreatedAtDesc(
             departmentList,
             PageRequest.of(curPageNumber - 1, DefaultPage)
-        )
-        if (noticeList.isEmpty())
-            throw NoticeNotFoundException()
-        val noticeDTOList = noticeList.stream().map { notice -> NoticeDTO(notice) }.collect(Collectors.toList())
-        return makeBaseResponse(noticeList.size.toLong(), curPageNumber, NoticeAllUrl, noticeDTOList)
+        ).stream().map { notice -> NoticeDTO(notice) }.collect(Collectors.toList())
+        return makeBaseResponse(count, curPageNumber, NoticeAllUrl, noticeList)
     }
 
     fun getNoticeByDepartmentAndKeywords(
@@ -53,11 +49,10 @@ class NoticeService(
     ): BaseResponse<NoticeDTO> {
         val departmentList = departments.split("+", " ").toList()
         val keywordList = keywords.split("+", " ").toList()
+        val count = noticeCustomRepository.getTotalSizeByDepartmentAndKeyword(departmentList, keywordList)
         val noticeList =
-            noticeCustomRepository.getAllByDepartmentAndKeyword(departmentList, keywordList, curPageNumber - 1)
-        if (noticeList.isEmpty())
-            throw NoticeNotFoundException()
-        val noticeDTOList = noticeList.stream().map { notice -> NoticeDTO(notice) }.collect(Collectors.toList())
-        return makeBaseResponse(noticeList.size.toLong(), curPageNumber, NoticeAllUrl, noticeDTOList)
+            noticeCustomRepository.getAllByDepartmentAndKeyword(departmentList, keywordList, curPageNumber - 1).stream()
+                .map { notice -> NoticeDTO(notice) }.collect(Collectors.toList())
+        return makeBaseResponse(count, curPageNumber, NoticeAllUrl, noticeList)
     }
 }
