@@ -15,6 +15,7 @@ class AccountController(
 ) {
 
     @GetMapping("/device")
+    @ResponseStatus(value = HttpStatus.OK)
     fun getDevice(@RequestParam("id") id: String): DeviceDTO {
         return deviceService.getDeviceById(id)
     }
@@ -25,7 +26,14 @@ class AccountController(
         return deviceService.saveNewDevice(newDevice)
     }
 
+    @PostMapping("/device-info")
+    @ResponseStatus(value = HttpStatus.OK)
+    fun getDeviceById(@RequestBody id: String):DeviceDTO {
+        return deviceService.getDeviceById(id)
+    }
+
     @PutMapping("/device")
+    @ResponseStatus(value = HttpStatus.OK)
     fun putDevice(@RequestBody updateDevice: DeviceDTO): DeviceDTO {
         return deviceService.updateDevice(updateDevice)
     }
@@ -37,6 +45,7 @@ class AccountController(
     }
 
     @GetMapping("/user")
+    @ResponseStatus(value = HttpStatus.OK)
     fun getUser(@RequestParam("id") id: String): UserDTO {
         return userService.getUserById(id)
     }
@@ -48,6 +57,7 @@ class AccountController(
     }
 
     @PutMapping("/user")
+    @ResponseStatus(value = HttpStatus.OK)
     fun putUser(@RequestBody updateUser: UserDTO): UserDTO {
         return userService.updateUser(updateUser)
     }
