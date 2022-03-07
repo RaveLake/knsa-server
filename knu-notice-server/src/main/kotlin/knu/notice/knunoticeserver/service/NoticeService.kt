@@ -24,7 +24,7 @@ class NoticeService(
             PageRequest.of(
                 curPageNumber - 1,
                 DefaultPage,
-                Sort.by("createdAt").descending()
+                Sort.by("date").descending()
             )
         ).content.stream().map { notice -> NoticeDTO(notice) }.collect(
             Collectors.toList()
@@ -35,7 +35,7 @@ class NoticeService(
     fun getNoticeByDepartment(curPageNumber: Int, departments: String): BaseResponse<NoticeDTO> {
         val departmentList = departments.split("+", " ").toList()
         val count = noticeRepository.getTotalSizeByCodeIn(departmentList)
-        val noticeList = noticeRepository.getAllByCodeInOrderByCreatedAtDesc(
+        val noticeList = noticeRepository.getAllByCodeInOrderByDateDesc(
             departmentList,
             PageRequest.of(curPageNumber - 1, DefaultPage)
         ).stream().map { notice -> NoticeDTO(notice) }.collect(Collectors.toList())

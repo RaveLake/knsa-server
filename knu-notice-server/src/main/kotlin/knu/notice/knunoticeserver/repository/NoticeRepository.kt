@@ -11,6 +11,6 @@ import org.springframework.stereotype.Repository
 interface NoticeRepository : JpaRepository<Notice, Long> {
     @Query("SELECT COUNT(n) FROM Notice n WHERE n.code in(:codes)")
     fun getTotalSizeByCodeIn(codes: List<String>): Long
-    fun getAllByCodeInOrderByCreatedAtDesc(codes: List<String>, page: Pageable): Page<Notice>
+    fun getAllByCodeInOrderByDateDesc(codes: List<String>, page: Pageable): Page<Notice>
     fun getAllByIdGreaterThan(prevId: Long): List<Notice>
 }

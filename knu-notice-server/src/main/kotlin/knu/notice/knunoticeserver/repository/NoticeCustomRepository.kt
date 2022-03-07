@@ -23,7 +23,7 @@ class NoticeCustomRepository(private val jpaQueryFactory: JPAQueryFactory) {
         return jpaQueryFactory
             .selectFrom(qNotice)
             .where(getDepartmentsAndKeywordsWhere(departments, keywords))
-            .orderBy(qNotice.createdAt.desc())
+            .orderBy(qNotice.date.desc())
             .fetch().size.toLong()
     }
 
@@ -36,7 +36,7 @@ class NoticeCustomRepository(private val jpaQueryFactory: JPAQueryFactory) {
         return jpaQueryFactory
             .selectFrom(qNotice)
             .where(getDepartmentsAndKeywordsWhere(departments, keywords))
-            .orderBy(qNotice.createdAt.desc())
+            .orderBy(qNotice.date.desc())
             .offset(curPageNumber.toLong())
             .limit(DefaultPage.toLong())
             .fetch()
