@@ -37,7 +37,7 @@ class NoticeCustomRepository(private val jpaQueryFactory: JPAQueryFactory) {
             .selectFrom(qNotice)
             .where(getDepartmentsAndKeywordsWhere(departments, keywords))
             .orderBy(qNotice.date.desc())
-            .offset(curPageNumber.toLong())
+            .offset(curPageNumber.toLong()* DefaultPage)
             .limit(DefaultPage.toLong())
             .fetch()
     }

@@ -1,1 +1,0 @@
-create index noticeDepartmentIndex on notice(code)
