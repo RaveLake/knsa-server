@@ -1,9 +1,9 @@
 package knu.notice.knunoticeserver.service
 
 import knu.notice.knunoticeserver.domain.User
+import knu.notice.knunoticeserver.dto.UserDTO
 import knu.notice.knunoticeserver.error.exception.BadRequestException
 import knu.notice.knunoticeserver.error.exception.UserNotFoundException
-import knu.notice.knunoticeserver.dto.UserDTO
 import knu.notice.knunoticeserver.repository.UserRepository
 import org.springframework.orm.jpa.JpaObjectRetrievalFailureException
 import org.springframework.stereotype.Service

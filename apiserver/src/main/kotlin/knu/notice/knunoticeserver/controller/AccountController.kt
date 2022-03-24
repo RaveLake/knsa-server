@@ -4,7 +4,6 @@ import knu.notice.knunoticeserver.dto.DeviceDTO
 import knu.notice.knunoticeserver.dto.UserDTO
 import knu.notice.knunoticeserver.service.DeviceService
 import knu.notice.knunoticeserver.service.UserService
-import knu.notice.knunoticeserver.util.getLogger
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 
@@ -28,7 +27,7 @@ class AccountController(
 
     @PostMapping("/device-info")
     @ResponseStatus(value = HttpStatus.OK)
-    fun getDeviceById(@RequestBody id: String):DeviceDTO {
+    fun getDeviceById(@RequestBody id: String): DeviceDTO {
         return deviceService.getDeviceById(id)
     }
 

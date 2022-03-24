@@ -1,10 +1,14 @@
 package knu.notice.knunoticeserver.domain
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import knu.notice.knunoticeserver.dto.DeviceDTO
 import java.time.LocalDateTime
 import java.util.*
-import javax.persistence.*
+import javax.persistence.Entity
+import javax.persistence.Id
+import javax.persistence.OneToMany
+import javax.persistence.Table
 
 @Entity
 @Table(name = "device")
@@ -31,8 +35,11 @@ class Device(
     )
 
     @OneToMany(mappedBy = "device")
+    @JsonIgnore
     var keywords: List<Keyword> = Collections.emptyList()
+
     @OneToMany(mappedBy = "device")
+    @JsonIgnore
     var subscriptions: List<Subscription> = Collections.emptyList()
 
     fun update(updateDevice: DeviceDTO) {

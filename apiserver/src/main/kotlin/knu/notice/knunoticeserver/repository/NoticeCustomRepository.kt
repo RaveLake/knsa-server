@@ -2,18 +2,11 @@ package knu.notice.knunoticeserver.repository
 
 import com.querydsl.core.BooleanBuilder
 import com.querydsl.core.types.dsl.BooleanExpression
-import com.querydsl.jpa.impl.JPAQuery
 import com.querydsl.jpa.impl.JPAQueryFactory
 import knu.notice.knunoticeserver.domain.DefaultPage
 import knu.notice.knunoticeserver.domain.Notice
 import knu.notice.knunoticeserver.domain.QNotice
-import org.springframework.jdbc.core.JdbcTemplate
-import org.springframework.jdbc.core.RowMapper
 import org.springframework.stereotype.Repository
-import java.sql.ResultSet
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import java.util.stream.Collectors
 
 @Repository
 class NoticeCustomRepository(private val jpaQueryFactory: JPAQueryFactory) {
@@ -37,7 +30,7 @@ class NoticeCustomRepository(private val jpaQueryFactory: JPAQueryFactory) {
             .selectFrom(qNotice)
             .where(getDepartmentsAndKeywordsWhere(departments, keywords))
             .orderBy(qNotice.date.desc())
-            .offset(curPageNumber.toLong()* DefaultPage)
+            .offset(curPageNumber.toLong() * DefaultPage)
             .limit(DefaultPage.toLong())
             .fetch()
     }
@@ -48,6 +41,6 @@ class NoticeCustomRepository(private val jpaQueryFactory: JPAQueryFactory) {
         for (keyword in keywords) {
             boolExp.or(qNotice.title.like("%$keyword%"))
         }
-        return qNotice.code.`in`(departments).and(boolExp)
+        return qNotice.code.code.`in`(departments).and(boolExp)
     }
 }

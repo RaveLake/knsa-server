@@ -7,7 +7,9 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/notice")
-class PushAlarmController(private val pushAlarmService: PushAlarmService) {
+class PushAlarmController(
+    private val pushAlarmService: PushAlarmService,
+) {
     @PostMapping("/push")
     fun postPushAlarm() {
         pushAlarmService.sendMessage()
