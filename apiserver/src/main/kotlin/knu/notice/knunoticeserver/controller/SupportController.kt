@@ -11,6 +11,6 @@ import org.springframework.web.bind.annotation.RestController
 class SupportController(private val supportRepository: SupportRepository) {
     @GetMapping("/version")
     fun getVersion(): SupportDTO {
-        return SupportDTO(supportRepository.getById(1))
+        return SupportDTO(supportRepository.getById("version"))
     }
 }
