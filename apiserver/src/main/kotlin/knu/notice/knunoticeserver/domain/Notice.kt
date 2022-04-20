@@ -11,7 +11,7 @@ class Notice(
     @Id
     val id: Long,
     val bid: Long,
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "code")
     val code: Category,
     @JsonProperty("is_fixed")

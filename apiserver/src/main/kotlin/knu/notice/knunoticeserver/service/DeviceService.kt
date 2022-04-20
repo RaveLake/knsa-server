@@ -42,7 +42,7 @@ class DeviceService(
         if (deviceRepository.findById(newDevice.id).isPresent) {
             throw DeviceNotFoundException()
         }
-        val result = deviceRepository.save(Device(newDevice, LocalDateTime.now()))
+        val result = deviceRepository.save(Device(newDevice))
         return DeviceDTO(result, Collections.emptyList(), Collections.emptyList())
     }
 

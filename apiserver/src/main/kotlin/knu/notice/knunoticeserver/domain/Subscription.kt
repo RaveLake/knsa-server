@@ -5,10 +5,10 @@ import javax.persistence.*
 @Entity
 @Table(name = "subscription")
 class Subscription(
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "device_id")
     val device: Device,
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_code")
     val category: Category
 ) {

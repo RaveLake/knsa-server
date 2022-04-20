@@ -3,14 +3,15 @@ package knu.notice.knunoticeserver.domain
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import knu.notice.knunoticeserver.dto.DeviceDTO
+import org.springframework.data.annotation.CreatedDate
+import org.springframework.data.annotation.LastModifiedDate
+import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import java.time.LocalDateTime
 import java.util.*
-import javax.persistence.Entity
-import javax.persistence.Id
-import javax.persistence.OneToMany
-import javax.persistence.Table
+import javax.persistence.*
 
 @Entity
+@EntityListeners(AuditingEntityListener::class)
 @Table(name = "device")
 class Device(
     @Id
@@ -21,24 +22,27 @@ class Device(
     var alarmSwitchSub: Boolean,
     @JsonProperty("alarm_switch_key")
     var alarmSwitchKey: Boolean,
-    @JsonProperty("created_at")
-    val createdAt: LocalDateTime,
-    @JsonProperty("updated_at")
-    var updatedAt: LocalDateTime
 ) {
-    constructor(device: DeviceDTO, now: LocalDateTime) : this(
+    @CreatedDate
+    var createdAt: LocalDateTime = LocalDateTime.MIN
+        private set
+
+    @LastModifiedDate
+    var updatedAt: LocalDateTime= LocalDateTime.MIN
+        private set
+
+    constructor(device: DeviceDTO) : this(
         device.id,
         device.idMethod,
         device.alarmSwitchSub,
         device.alarmSwitchKey,
-        now, now
     )
 
-    @OneToMany(mappedBy = "device")
+    @OneToMany(mappedBy = "device", fetch = FetchType.LAZY)
     @JsonIgnore
     var keywords: List<Keyword> = Collections.emptyList()
 
-    @OneToMany(mappedBy = "device")
+    @OneToMany(mappedBy = "device", fetch = FetchType.LAZY)
     @JsonIgnore
     var subscriptions: List<Subscription> = Collections.emptyList()
 
@@ -46,6 +50,5 @@ class Device(
         idMethod = updateDevice.idMethod
         alarmSwitchSub = updateDevice.alarmSwitchSub
         alarmSwitchKey = updateDevice.alarmSwitchKey
-        updatedAt = LocalDateTime.now()
     }
 }

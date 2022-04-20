@@ -28,7 +28,7 @@ class UserService(private val userRepository: UserRepository) {
         if (userRepository.findById(newUser.id).isPresent) {
             throw BadRequestException()
         } else {
-            val result = userRepository.save(User(newUser, LocalDateTime.now()))
+            val result = userRepository.save(User(newUser))
             return UserDTO(result)
         }
     }

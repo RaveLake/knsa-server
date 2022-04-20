@@ -3,10 +3,7 @@ package knu.notice.knunoticeserver.domain
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import java.util.*
-import javax.persistence.Entity
-import javax.persistence.Id
-import javax.persistence.OneToMany
-import javax.persistence.Table
+import javax.persistence.*
 
 @Entity
 @Table(name = "category")
@@ -18,7 +15,7 @@ class Category(
     @JsonProperty("api_url")
     val apiUrl: String
 ) {
-    @OneToMany(mappedBy = "category")
+    @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
     @JsonIgnore
     val subscriptions: List<Subscription> = Collections.emptyList()
 }
