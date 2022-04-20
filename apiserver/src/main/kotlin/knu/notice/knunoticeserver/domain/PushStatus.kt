@@ -14,10 +14,12 @@ import javax.persistence.Table
 @Table(name = "push_status")
 class PushStatus(
     @Id
-    val id: Long,
+    val id: String,
     @JsonProperty("notice_id")
     val noticeId: Long,
+) {
     @LastModifiedDate
     @JsonProperty("updated_at")
-    val updatedAt: LocalDateTime
-)
+    var updatedAt: LocalDateTime = LocalDateTime.MIN
+        private set
+}

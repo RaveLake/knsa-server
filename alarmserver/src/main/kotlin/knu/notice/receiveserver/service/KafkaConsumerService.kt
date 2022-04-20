@@ -12,14 +12,14 @@ import org.springframework.stereotype.Service
 
 @Service
 class KafkaConsumerService(
-    private val firebaseApp: FirebaseApp,
+    firebaseApp: FirebaseApp,
 ) {
 
     private val fcm = FirebaseMessaging.getInstance(firebaseApp)
+    private val objectMapper = ObjectMapper()
 
     @KafkaListener(topics = ["alarm"], groupId = "alarm")
     fun receiveAlarm(message: String) {
-        val objectMapper = ObjectMapper()
         val jsonMessage = objectMapper.readValue<MessageInfo>(message)
         val sendMessage = Message.builder().setNotification(Notification(jsonMessage.title, jsonMessage.body))
             .setToken(jsonMessage.id).build()
