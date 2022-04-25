@@ -47,16 +47,22 @@ class PushAlarmService(
         for (notice in newNoticeList) {
             loop@ for (user in notice.code.subscriptions) {
                 val code = user.category.code
-                val deviceId = user.device.id
-                for (keyword in user.device.keywords) {
-                    if (notice.title.contains(keyword.keyword)) {
-                        val message = MessageInfo(keywordAlarmTitle, mappingName.getOrDefault(code, "Error"), deviceId)
-                        kafkaTemplate.send(TOPIC, getJsonStringMessageInfo(message))
-                        continue@loop
+                val userDevice = user.device
+                val deviceId = userDevice.id
+                if(userDevice.alarmSwitchKey) {
+                    for (keyword in user.device.keywords) {
+                        if (notice.title.contains(keyword.keyword)) {
+                            val message =
+                                MessageInfo(keywordAlarmTitle, mappingName.getOrDefault(code, "Error"), deviceId)
+                            kafkaTemplate.send(TOPIC, getJsonStringMessageInfo(message))
+                            continue@loop
+                        }
                     }
                 }
-                val message = MessageInfo(subscriptionAlarmTitle, mappingName.getOrDefault(code, "Error"), deviceId)
-                kafkaTemplate.send(TOPIC, getJsonStringMessageInfo(message))
+                if(userDevice.alarmSwitchSub) {
+                    val message = MessageInfo(subscriptionAlarmTitle, mappingName.getOrDefault(code, "Error"), deviceId)
+                    kafkaTemplate.send(TOPIC, getJsonStringMessageInfo(message))
+                }
             }
         }
 
