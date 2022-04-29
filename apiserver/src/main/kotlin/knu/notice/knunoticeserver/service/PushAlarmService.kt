@@ -39,10 +39,10 @@ class PushAlarmService(
         // PushStatus에서 마지막으로 보낸 공지사항의 번호를 가져온다.
         val prevStatus = pushStatusRepository.getById(PushStatusId)
         // 이후에 새로 들어온 모든 공지를 가져온다.
-        val newNoticeList = noticeRepository.getAllByIdGreaterThan(prevStatus.noticeId)
+        val newNoticeList = noticeRepository.getAllByIdGreaterThanOrderByIdAsc(prevStatus.noticeId)
         if(newNoticeList.isEmpty())
             return
-        var lastNoticeId = newNoticeList[newNoticeList.size - 1].id
+        val lastNoticeId = newNoticeList[newNoticeList.size - 1].id
 
         for (notice in newNoticeList) {
             loop@ for (user in notice.code.subscriptions) {
@@ -53,14 +53,14 @@ class PushAlarmService(
                     for (keyword in user.device.keywords) {
                         if (notice.title.contains(keyword.keyword)) {
                             val message =
-                                MessageInfo(keywordAlarmTitle, mappingName.getOrDefault(code, "Error"), deviceId)
+                                MessageInfo(keywordAlarmTitle, mappingName[code]!! + ": " + keyword.keyword, deviceId)
                             kafkaTemplate.send(TOPIC, getJsonStringMessageInfo(message))
                             continue@loop
                         }
                     }
                 }
                 if(userDevice.alarmSwitchSub) {
-                    val message = MessageInfo(subscriptionAlarmTitle, mappingName.getOrDefault(code, "Error"), deviceId)
+                    val message = MessageInfo(subscriptionAlarmTitle, mappingName[code]!!, deviceId)
                     kafkaTemplate.send(TOPIC, getJsonStringMessageInfo(message))
                 }
             }

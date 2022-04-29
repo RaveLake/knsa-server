@@ -14,5 +14,5 @@ interface NoticeRepository : JpaRepository<Notice, Long> {
 
     @Query("SELECT n FROM Notice n WHERE n.code.code in (:codes) ORDER BY n.date DESC")
     fun getAllByCodeInOrderByDateDesc(codes: List<String>, page: Pageable): Page<Notice>
-    fun getAllByIdGreaterThan(prevId: Long): List<Notice>
+    fun getAllByIdGreaterThanOrderByIdAsc(prevId: Long): List<Notice>
 }
