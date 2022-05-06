@@ -1,3 +1,3 @@
-rootProject.name = "knu-notice-server"
+rootProject.name = "knsa-server"
 include("apiserver")
 include("alarmserver")
