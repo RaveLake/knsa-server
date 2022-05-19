@@ -12,10 +12,9 @@ import org.springframework.web.bind.annotation.*
 class AccountController(
     private val userService: UserService, private val deviceService: DeviceService,
 ) {
-
-    @GetMapping("/device")
+    @PostMapping("/device-info")
     @ResponseStatus(value = HttpStatus.OK)
-    fun getDevice(@RequestParam("id") id: String): DeviceDTO {
+    fun getDeviceById(@RequestBody id: String): DeviceDTO {
         return deviceService.getDeviceById(id)
     }
 
@@ -23,12 +22,6 @@ class AccountController(
     @ResponseStatus(value = HttpStatus.CREATED)
     fun postDevice(@RequestBody newDevice: DeviceDTO): DeviceDTO {
         return deviceService.saveNewDevice(newDevice)
-    }
-
-    @PostMapping("/device-info")
-    @ResponseStatus(value = HttpStatus.OK)
-    fun getDeviceById(@RequestBody id: String): DeviceDTO {
-        return deviceService.getDeviceById(id)
     }
 
     @PutMapping("/device")

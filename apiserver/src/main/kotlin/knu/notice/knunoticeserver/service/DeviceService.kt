@@ -8,10 +8,9 @@ import knu.notice.knunoticeserver.error.exception.DeviceNotFoundException
 import knu.notice.knunoticeserver.repository.CategoryRepository
 import knu.notice.knunoticeserver.repository.DeviceRepository
 import knu.notice.knunoticeserver.repository.KeywordRepository
-import knu.notice.knunoticeserver.repository.Subscriptionrepository
+import knu.notice.knunoticeserver.repository.SubscriptionRepository
 import org.springframework.orm.jpa.JpaObjectRetrievalFailureException
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
 import java.util.*
 import java.util.stream.Collectors
 import javax.transaction.Transactional
@@ -22,7 +21,7 @@ class DeviceService(
     private val deviceRepository: DeviceRepository,
     private val categoryRepository: CategoryRepository,
     private val keywordRepository: KeywordRepository,
-    private val subscriptionRepository: Subscriptionrepository
+    private val subscriptionRepository: SubscriptionRepository
 ) {
 
     fun getDeviceById(id: String): DeviceDTO {
