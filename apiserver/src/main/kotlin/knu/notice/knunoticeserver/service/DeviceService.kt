@@ -29,7 +29,7 @@ class DeviceService(
             val device = deviceRepository.getById(id)
             val keywords = device.keywords.stream().map { v -> v.keyword }.collect(Collectors.toList())
             val subscriptions =
-                device.subscriptions.stream().map { v -> v.category.code }.collect(Collectors.toList())
+                device.subscriptions.stream().map { v -> v.category }.collect(Collectors.toList())
             DeviceDTO(deviceRepository.getById(id), keywords, subscriptions)
         } catch (e: JpaObjectRetrievalFailureException) {
             throw DeviceNotFoundException()
@@ -71,14 +71,14 @@ class DeviceService(
             }
         }
 
-        val categoryMap = categoryRepository.findAll().associateBy { it.code }.toMutableMap()
-        val subscriptionHash = existingDevice.subscriptions.associateBy { it.category.code }.toMutableMap()
+        val categorySet = categoryRepository.findAll().stream().map { it.code }.toList().toHashSet()
+        val subscriptionHash = existingDevice.subscriptions.associateBy { it.category }.toMutableMap()
         val addSubscriptionList = arrayListOf<Subscription>()
         for (subscription in updateDevice.subscriptions) {
             if (subscriptionHash.containsKey(subscription)) {
                 subscriptionHash.remove(subscription)
-            } else {
-                addSubscriptionList.add(Subscription(existingDevice, categoryMap.getValue(subscription)))
+            } else if(categorySet.contains(subscription)) {
+                addSubscriptionList.add(Subscription(existingDevice, subscription))
             }
         }
 

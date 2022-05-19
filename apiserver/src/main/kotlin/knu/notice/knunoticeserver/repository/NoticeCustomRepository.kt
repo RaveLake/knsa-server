@@ -16,7 +16,6 @@ class NoticeCustomRepository(private val jpaQueryFactory: JPAQueryFactory) {
         return jpaQueryFactory
             .selectFrom(qNotice)
             .where(getDepartmentsAndKeywordsWhere(departments, keywords))
-            .orderBy(qNotice.date.desc())
             .fetch().size.toLong()
     }
 

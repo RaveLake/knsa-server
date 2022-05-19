@@ -14,8 +14,4 @@ class Category(
     val department: String,
     @JsonProperty("api_url")
     val apiUrl: String
-) {
-    @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
-    @JsonIgnore
-    val subscriptions: List<Subscription> = Collections.emptyList()
-}
+)

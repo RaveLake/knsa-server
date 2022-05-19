@@ -1,21 +1,25 @@
 package knu.notice.knunoticeserver.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import knu.notice.knunoticeserver.domain.Device
 import knu.notice.knunoticeserver.domain.MessageInfo
 import knu.notice.knunoticeserver.domain.PushStatus
 import knu.notice.knunoticeserver.repository.CategoryRepository
 import knu.notice.knunoticeserver.repository.NoticeRepository
 import knu.notice.knunoticeserver.repository.PushStatusRepository
+import knu.notice.knunoticeserver.repository.SubscriptionRepository
 import knu.notice.knunoticeserver.util.getLogger
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
+import kotlin.streams.toList
 
 @Service
 class PushAlarmService(
     private val noticeRepository: NoticeRepository,
     private val pushStatusRepository: PushStatusRepository,
     private val categoryRepository: CategoryRepository,
+    private val subscriptionRepository: SubscriptionRepository,
     private val kafkaTemplate: KafkaTemplate<String, String>
 ) {
 
@@ -40,17 +44,22 @@ class PushAlarmService(
         val prevStatus = pushStatusRepository.getById(PushStatusId)
         // 이후에 새로 들어온 모든 공지를 가져온다.
         val newNoticeList = noticeRepository.getAllByIdGreaterThanOrderByIdAsc(prevStatus.noticeId)
-        if(newNoticeList.isEmpty())
+        if (newNoticeList.isEmpty())
             return
         val lastNoticeId = newNoticeList[newNoticeList.size - 1].id
+        val deviceMapByCategory = hashMapOf<String, List<Device>>()
+        for (notice in newNoticeList) {
+            if (!deviceMapByCategory.containsKey(notice.code)) {
+                deviceMapByCategory[notice.code] = subscriptionRepository.getAllByCategoryEquals(notice.code).stream().map { it.device }.toList()
+            }
+        }
 
         for (notice in newNoticeList) {
-            loop@ for (user in notice.code.subscriptions) {
-                val code = user.category.code
-                val userDevice = user.device
-                val deviceId = userDevice.id
-                if(userDevice.alarmSwitchKey) {
-                    for (keyword in user.device.keywords) {
+            val code = notice.code
+            loop@ for (user in deviceMapByCategory[code]!!) {
+                val deviceId = user.id
+                if (user.alarmSwitchKey) {
+                    for (keyword in user.keywords) {
                         if (notice.title.contains(keyword.keyword)) {
                             val message =
                                 MessageInfo(keywordAlarmTitle, mappingName[code]!! + ": " + keyword.keyword, deviceId)
@@ -59,7 +68,7 @@ class PushAlarmService(
                         }
                     }
                 }
-                if(userDevice.alarmSwitchSub) {
+                if (user.alarmSwitchSub) {
                     val message = MessageInfo(subscriptionAlarmTitle, mappingName[code]!!, deviceId)
                     kafkaTemplate.send(TOPIC, getJsonStringMessageInfo(message))
                 }
